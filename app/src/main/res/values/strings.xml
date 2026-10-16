@@ -78,6 +78,8 @@
     <string name="permissions_section_biometric">Biometric unlock</string>
     <string name="badge_recommended">Recommended</string>
     <string name="badge_alternative">Alternative</string>
+    <string name="badge_required">Required</string>
+    <string name="permissions_section_detection_single">Detect locked apps</string>
     <string name="perm_accessibility_title">Accessibility service</string>
     <string name="perm_accessibility_description">Instantly notices when an app opens, with no battery drain. App Lock only sees the app\'s name, never the contents of your screen.</string>
     <string name="perm_restricted_settings_hint">Switch greyed out? On Android 13+ open App info, tap ⋮ and choose “Allow restricted settings”, then try again.</string>

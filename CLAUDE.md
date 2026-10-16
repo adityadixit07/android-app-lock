@@ -9,4 +9,5 @@
   - Every unlock path goes through `Authenticator` (lockout) and reports to `LockEngine`.
   - Fail closed on detection/overlay errors; never lock when no credential exists.
   - No `INTERNET` permission, no analytics or ads SDKs.
-- Commands: `./gradlew assembleDebug`, `./gradlew testDebugUnitTest`, `./gradlew lintDebug`.
+- Flavors: `standard` (default, no AccessibilityService, Play-Protect-safe) and `full`.
+- Commands: `./gradlew assembleStandardDebug assembleFullDebug`, `./gradlew testStandardDebugUnitTest`, `./gradlew lintStandardDebug lintFullDebug`.

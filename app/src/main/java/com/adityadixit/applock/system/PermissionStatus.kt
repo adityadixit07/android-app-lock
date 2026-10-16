@@ -11,6 +11,7 @@ import android.os.PowerManager
 import android.os.Process
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
+import com.adityadixit.applock.BuildConfig
 import com.adityadixit.applock.admin.AppLockDeviceAdminReceiver
 import com.adityadixit.applock.service.AppLockAccessibilityService
 
@@ -21,6 +22,8 @@ enum class DetectionMode { ACCESSIBILITY, USAGE_STATS, NONE }
 object PermissionStatus {
 
     fun isAccessibilityServiceEnabled(context: Context): Boolean {
+        // The "standard" flavor doesn't declare the service at all.
+        if (!BuildConfig.ACCESSIBILITY_DETECTION) return false
         val expected = ComponentName(context, AppLockAccessibilityService::class.java)
         val enabled = Settings.Secure.getString(
             context.contentResolver,

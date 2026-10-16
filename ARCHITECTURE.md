@@ -118,6 +118,18 @@ it is unbound.
 | Android 13+ sideload | "Allow restricted settings" step needed | Not affected |
 | Privacy | Configured with `canRetrieveWindowContent=false`: sees package/class names only | Sees package names of resumed activities only |
 
+**Build flavors.** Google Play Protect's fraud protection (rolled out in India and other
+regions) blocks browser/file-manager installs of any app that *declares* an AccessibilityService,
+and Play policy forbids it for app lockers. So detection is split by product flavor:
+
+| Flavor | Manifest | Detection | Install path |
+|---|---|---|---|
+| `standard` (default) | no accessibility service | Usage Access + overlay | Browser, Play Store, anywhere |
+| `full` | `src/full/AndroidManifest.xml` adds the service | Accessibility (falls back to Usage Access) | `adb install`, F-Droid, Play Protect paused |
+
+`BuildConfig.ACCESSIBILITY_DETECTION` hides the accessibility option in the UI and
+short-circuits `PermissionStatus.isAccessibilityServiceEnabled()` in `standard`.
+
 **False-positive filter (accessibility):** dialogs, keyboards, toasts and chat-head bubbles
 also fire window-state events. The service only reacts when `packageName/className` resolves to
 a real `Activity` (`PackageManager.getActivityInfo`, LRU-cached). Without this, a floating
@@ -207,7 +219,7 @@ example, for per-app relock policies).
 * `app/debug.keystore` is the **public** debug key (password `android`), committed on purpose so
   every CI build has the same signature and can be installed over the previous one. Release
   builds must use a private key supplied via CI secrets; never this one.
-* CI (`.github/workflows/android.yml`): `build` (unit tests + debug APK artifact) → `publish-debug`
+* CI (`.github/workflows/android.yml`): `build` (unit tests + `standard` and `full` debug APKs) → `publish-debug`
   replaces the `debug-latest` GitHub pre-release with the new APK. `lint` runs as a separate job
   so a lint finding never blocks a testable APK.
 
@@ -216,5 +228,4 @@ example, for per-app relock policies).
 * **Per-app settings** (own relock policy, own credential): add a Room table behind
   `LockedAppsRepository`. `LockEngine` already keys sessions per package.
 * **Intruder selfie / failed-attempt log:** subscribe to `VerifyResult.Failure` in `Authenticator`.
-* **Play Store flavour:** add a product flavour that drops the accessibility service from its
-  manifest. The rest of the app already runs on Usage Access.
+* **Play Store release:** ship the `standard` flavor (no accessibility service).

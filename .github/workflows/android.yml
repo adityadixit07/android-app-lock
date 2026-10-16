@@ -27,18 +27,22 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+        run: ./gradlew testStandardDebugUnitTest --stacktrace
 
-      - name: Assemble debug APK
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Assemble debug APKs (standard + full)
+        run: ./gradlew assembleStandardDebug assembleFullDebug --stacktrace
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk AppLock-debug.apk
+      - name: Rename APKs
+        run: |
+          cp app/build/outputs/apk/standard/debug/app-standard-debug.apk AppLock-debug.apk
+          cp app/build/outputs/apk/full/debug/app-full-debug.apk AppLock-full-debug.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: AppLock-debug
-          path: AppLock-debug.apk
+          path: |
+            AppLock-debug.apk
+            AppLock-full-debug.apk
           if-no-files-found: error
 
   # Separate job so a lint finding never blocks the testable APK; it still fails the run.
@@ -53,12 +57,12 @@ jobs:
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
       - name: Lint
-        run: ./gradlew lintDebug --stacktrace
+        run: ./gradlew lintStandardDebug lintFullDebug --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lint-report
-          path: app/build/reports/lint-results-debug.html
+          path: app/build/reports/lint-results-*.html
           if-no-files-found: ignore
 
   # Publishes the latest debug APK as a GitHub pre-release so it can be downloaded
@@ -80,8 +84,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           gh release delete debug-latest --yes --cleanup-tag || true
-          gh release create debug-latest AppLock-debug.apk \
+          gh release create debug-latest AppLock-debug.apk AppLock-full-debug.apk \
             --prerelease \
             --target "$GITHUB_SHA" \
             --title "App Lock — latest debug build" \
-            --notes "Debug build of ${GITHUB_SHA::7} from \`${GITHUB_REF_NAME}\`. Install AppLock-debug.apk on your phone (allow installs from your browser). Signed with the public debug key, so newer builds install over older ones."
+            --notes "Debug build of ${GITHUB_SHA::7} from \`${GITHUB_REF_NAME}\`.
+
+          - **AppLock-debug.apk** (recommended): installs from your phone's browser. Detects apps via Usage Access.
+          - **AppLock-full-debug.apk**: adds instant Accessibility detection. Google Play Protect blocks it when installed from a browser in some regions; install with \`adb install -r\` instead.
+
+          Both are signed with the public debug key, so newer builds install over older ones."

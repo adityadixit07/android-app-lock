@@ -52,6 +52,23 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    // Google Play Protect (and Play policy) block sideloaded apps that declare an
+    // AccessibilityService. "standard" detects via Usage Access only and installs anywhere;
+    // "full" adds the instant accessibility detector (adb installs, F-Droid, power users).
+    flavorDimensions += "detection"
+    productFlavors {
+        create("standard") {
+            dimension = "detection"
+            isDefault = true
+            buildConfigField("boolean", "ACCESSIBILITY_DETECTION", "false")
+        }
+        create("full") {
+            dimension = "detection"
+            buildConfigField("boolean", "ACCESSIBILITY_DETECTION", "true")
+        }
     }
 
     packaging {

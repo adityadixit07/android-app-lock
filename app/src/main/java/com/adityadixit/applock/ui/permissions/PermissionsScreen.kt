@@ -58,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.adityadixit.applock.BuildConfig
 import com.adityadixit.applock.R
 import com.adityadixit.applock.system.BiometricStatus
 import com.adityadixit.applock.system.SystemIntents
@@ -140,35 +141,47 @@ private fun PermissionChecklist(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        SectionTitle(stringResource(R.string.permissions_section_detection))
-        PermissionCard(
-            icon = Icons.Default.Accessibility,
-            title = stringResource(R.string.perm_accessibility_title),
-            description = stringResource(R.string.perm_accessibility_description),
-            granted = perms.accessibility,
-            badge = stringResource(R.string.badge_recommended),
-            onAction = { systemScreens.launch(SystemIntents.accessibilitySettings()) },
-            footer = {
-                // Android 13+ greys out the switch for sideloaded APKs until "restricted settings"
-                // are allowed from the app info screen.
-                if (!perms.accessibility && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    Text(
-                        stringResource(R.string.perm_restricted_settings_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    TextButton(onClick = { systemScreens.launch(SystemIntents.appDetails(context)) }) {
-                        Text(stringResource(R.string.action_open_app_info))
-                    }
-                }
-            },
+        SectionTitle(
+            stringResource(
+                if (BuildConfig.ACCESSIBILITY_DETECTION) {
+                    R.string.permissions_section_detection
+                } else {
+                    R.string.permissions_section_detection_single
+                },
+            ),
         )
+        if (BuildConfig.ACCESSIBILITY_DETECTION) {
+            PermissionCard(
+                icon = Icons.Default.Accessibility,
+                title = stringResource(R.string.perm_accessibility_title),
+                description = stringResource(R.string.perm_accessibility_description),
+                granted = perms.accessibility,
+                badge = stringResource(R.string.badge_recommended),
+                onAction = { systemScreens.launch(SystemIntents.accessibilitySettings()) },
+                footer = {
+                    // Android 13+ greys out the switch for sideloaded APKs until "restricted settings"
+                    // are allowed from the app info screen.
+                    if (!perms.accessibility && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        Text(
+                            stringResource(R.string.perm_restricted_settings_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        TextButton(onClick = { systemScreens.launch(SystemIntents.appDetails(context)) }) {
+                            Text(stringResource(R.string.action_open_app_info))
+                        }
+                    }
+                },
+            )
+        }
         PermissionCard(
             icon = Icons.Default.DataUsage,
             title = stringResource(R.string.perm_usage_title),
             description = stringResource(R.string.perm_usage_description),
             granted = perms.usageAccess,
-            badge = stringResource(R.string.badge_alternative),
+            badge = stringResource(
+                if (BuildConfig.ACCESSIBILITY_DETECTION) R.string.badge_alternative else R.string.badge_required,
+            ),
             onAction = { systemScreens.launch(SystemIntents.usageAccessSettings()) },
         )
 

@@ -28,8 +28,9 @@ Requirements: **Android Studio Ladybug (2024.2) or newer**, **JDK 17**, Android 
 ```bash
 git clone https://github.com/adityadixit07/android-app-lock.git
 cd android-app-lock
-./gradlew assembleDebug          # APK → app/build/outputs/apk/debug/app-debug.apk
-./gradlew testDebugUnitTest      # JVM unit tests for the locking & auth logic
+./gradlew assembleStandardDebug      # APK → app/build/outputs/apk/standard/debug/
+./gradlew assembleFullDebug          # with Accessibility detection
+./gradlew testStandardDebugUnitTest  # JVM unit tests for the locking & auth logic
 ```
 
 Or open the folder in Android Studio and press **Run ▶**.
@@ -42,14 +43,25 @@ Or open the folder in Android Studio and press **Run ▶**.
 
 **Easiest — straight onto your phone:** open
 [Releases › debug-latest](https://github.com/adityadixit07/android-app-lock/releases/tag/debug-latest)
-in your phone's browser, download **AppLock-debug.apk** and tap it (allow "Install unknown apps"
+in your phone's browser, download **AppLock-debug.apk** (the `standard` flavor) and tap it (allow "Install unknown apps"
 for your browser when asked). CI rebuilds it on every push. Builds are signed with the committed
 public debug key, so newer builds install **over** older ones without losing your settings.
+
+> **"App blocked to protect your device" (Google Play Protect)?** That happens with
+> **AppLock-full-debug.apk**: Play Protect blocks browser installs of apps that declare an
+> Accessibility service. Use **AppLock-debug.apk** (Usage Access detection, installs normally), or
+> install the full build from a computer with `adb install -r AppLock-full-debug.apk`.
+
+| Flavor | APK | Detection |
+|---|---|---|
+| `standard` (default) | `AppLock-debug.apk` | Usage Access (~350 ms) |
+| `full` | `AppLock-full-debug.apk` | Instant Accessibility, falls back to Usage Access |
 
 **From a computer:**
 
 ```bash
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleStandardDebug   # or assembleFullDebug
+adb install -r app/build/outputs/apk/standard/debug/app-standard-debug.apk
 ```
 
 ### 2. First-run onboarding (in the app)

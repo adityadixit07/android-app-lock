@@ -76,19 +76,8 @@
             android:taskAffinity=""
             android:theme="@style/Theme.AppLock.Biometric" />
 
-        <!-- Primary detection: event-driven, zero polling. Reads package names only. -->
-        <service
-            android:name=".service.AppLockAccessibilityService"
-            android:exported="true"
-            android:label="@string/accessibility_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
-        </service>
+        <!-- AccessibilityService is declared only in the "full" flavor (src/full/AndroidManifest.xml). -->
+
 
         <!-- Fallback detection: foreground service polling UsageEvents while the screen is on. -->
         <service
