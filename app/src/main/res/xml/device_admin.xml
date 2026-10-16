@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    No policies requested. Being an active device admin is enough to block uninstallation
+    until the user deactivates the admin in Settings (which can itself be locked).
+-->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies />
+</device-admin>
