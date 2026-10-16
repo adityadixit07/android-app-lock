@@ -1,5 +1,6 @@
 package com.adityadixit.applock.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -125,6 +126,9 @@ class UsageMonitorService : Service() {
         runCatching { startActivity(home) }
     }
 
+    // foregroundServiceType="specialUse" is declared in src/main/AndroidManifest.xml; lint misses
+    // it when analysing the "full" flavor's merged manifest.
+    @SuppressLint("ForegroundServiceType")
     private fun startInForeground() {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
