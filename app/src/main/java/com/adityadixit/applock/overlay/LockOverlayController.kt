@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.ImageBitmap
@@ -28,6 +27,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.adityadixit.applock.R
 import com.adityadixit.applock.data.apps.AppIconLoader
 import com.adityadixit.applock.domain.auth.Authenticator
+import com.adityadixit.applock.ui.components.rememberLoaded
 import com.adityadixit.applock.ui.lock.LockScreen
 import com.adityadixit.applock.ui.lock.LockScreenController
 import com.adityadixit.applock.ui.theme.AppLockTheme
@@ -113,8 +113,8 @@ class LockOverlayController(
             val controller = remember {
                 LockScreenController(authenticator, scope) { onUnlocked(pkg) }
             }
-            val icon by produceState<ImageBitmap?>(null, pkg) { value = iconLoader.load(pkg) }
-            val label by produceState<String?>(null, pkg) { value = iconLoader.loadLabel(pkg) }
+            val icon = rememberLoaded(pkg) { iconLoader.load(pkg) }
+            val label = rememberLoaded(pkg) { iconLoader.loadLabel(pkg) }
 
             LaunchedEffect(current.autoPromptBiometric) {
                 if (current.autoPromptBiometric && current.canUseBiometric) onBiometricRequested(pkg)

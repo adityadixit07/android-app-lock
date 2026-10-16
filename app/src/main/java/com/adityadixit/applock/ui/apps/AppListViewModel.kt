@@ -30,10 +30,13 @@ data class AppRow(val app: InstalledApp, val locked: Boolean)
 data class AppListUiState(
     val loading: Boolean = true,
     val showSystemApps: Boolean = false,
-    val rows: List<AppRow> = emptyList(),
+    val lockedRows: List<AppRow> = emptyList(),
+    val otherRows: List<AppRow> = emptyList(),
     val lockedCount: Int = 0,
-    val protectionActive: Boolean = true,
-)
+    val detectionMode: DetectionMode = DetectionMode.ACCESSIBILITY,
+) {
+    val isEmpty: Boolean get() = lockedRows.isEmpty() && otherRows.isEmpty()
+}
 
 @HiltViewModel
 class AppListViewModel @Inject constructor(
@@ -51,15 +54,15 @@ class AppListViewModel @Inject constructor(
     var query by mutableStateOf("")
         private set
     private val showSystemApps = MutableStateFlow(false)
-    private val protectionActive = MutableStateFlow(true)
+    private val detectionMode = MutableStateFlow(DetectionMode.ACCESSIBILITY)
 
-    private data class Filters(val query: String, val showSystem: Boolean, val protectionActive: Boolean)
+    private data class Filters(val query: String, val showSystem: Boolean, val detectionMode: DetectionMode)
 
     val state: StateFlow<AppListUiState> = combine(
         installedApps,
         lockedAppsRepository.lockedPackages,
-        combine(snapshotFlow { query }, showSystemApps, protectionActive) { q, system, active ->
-            Filters(q, system, active)
+        combine(snapshotFlow { query }, showSystemApps, detectionMode) { q, system, mode ->
+            Filters(q, system, mode)
         },
     ) { apps, locked, filters ->
         val needle = filters.query.trim()
@@ -74,12 +77,14 @@ class AppListViewModel @Inject constructor(
             }
             .map { AppRow(it, it.packageName in locked) }
             .toList()
+        val (lockedRows, otherRows) = rows.partition { it.locked }
         AppListUiState(
             loading = apps == null,
             showSystemApps = filters.showSystem,
-            rows = rows,
+            lockedRows = lockedRows,
+            otherRows = otherRows,
             lockedCount = locked.size,
-            protectionActive = filters.protectionActive,
+            detectionMode = filters.detectionMode,
         )
     }
         .flowOn(defaultDispatcher)
@@ -87,7 +92,7 @@ class AppListViewModel @Inject constructor(
 
     /** Reloads installed apps and protection status; called on every resume. */
     fun refresh() {
-        protectionActive.value = PermissionStatus.detectionMode(context) != DetectionMode.NONE
+        detectionMode.value = PermissionStatus.detectionMode(context)
         viewModelScope.launch { installedApps.value = installedAppsRepository.getLaunchableApps() }
     }
 

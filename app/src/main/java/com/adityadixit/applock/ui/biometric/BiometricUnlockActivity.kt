@@ -16,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -29,6 +28,7 @@ import com.adityadixit.applock.data.apps.AppIconLoader
 import com.adityadixit.applock.domain.auth.Authenticator
 import com.adityadixit.applock.domain.lock.LockEngine
 import com.adityadixit.applock.system.BiometricAvailability
+import com.adityadixit.applock.ui.components.rememberLoaded
 import com.adityadixit.applock.ui.theme.AppLockTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -60,8 +60,8 @@ class BiometricUnlockActivity : FragmentActivity() {
 
         setContent {
             AppLockTheme {
-                val icon by produceState<ImageBitmap?>(null) { value = iconLoader.load(targetPackage) }
-                val label by produceState("") { value = iconLoader.loadLabel(targetPackage) }
+                val icon = rememberLoaded(targetPackage) { iconLoader.load(targetPackage) }
+                val label = rememberLoaded(targetPackage) { iconLoader.loadLabel(targetPackage) }.orEmpty()
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

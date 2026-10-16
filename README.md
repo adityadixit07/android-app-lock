@@ -40,6 +40,14 @@ Or open the folder in Android Studio and press **Run ▶**.
 
 ### 1. Install
 
+**Easiest — straight onto your phone:** open
+[Releases › debug-latest](https://github.com/adityadixit07/android-app-lock/releases/tag/debug-latest)
+in your phone's browser, download **AppLock-debug.apk** and tap it (allow "Install unknown apps"
+for your browser when asked). CI rebuilds it on every push. Builds are signed with the committed
+public debug key, so newer builds install **over** older ones without losing your settings.
+
+**From a computer:**
+
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```

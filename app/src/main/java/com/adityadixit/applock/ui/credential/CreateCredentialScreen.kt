@@ -104,6 +104,9 @@ fun CreateCredentialScreen(
                             onBackspace = viewModel::onBackspace,
                             onSubmit = viewModel::onSubmitPin,
                             submitEnabled = state.pinLength >= CredentialRules.MIN_PIN_LENGTH,
+                            submitLabel = stringResource(
+                                if (state.step == CredentialStep.ENTER) R.string.action_continue else R.string.action_confirm,
+                            ),
                         )
                     }
                     CredentialType.PATTERN -> PatternLock(

@@ -27,6 +27,8 @@ data class LockUiState(
     val verifying: Boolean = false,
     /** Incremented to ask the pattern view to clear its drawing. */
     val patternResetToken: Int = 0,
+    /** Incremented on every rejected attempt; drives the shake animation. */
+    val errorToken: Int = 0,
 ) {
     val inputEnabled: Boolean get() = !verifying && lockoutSeconds == 0
 }
@@ -83,6 +85,7 @@ class LockScreenController(
             state = state.copy(
                 message = LockMessage.PatternTooShort,
                 patternResetToken = state.patternResetToken + 1,
+                errorToken = state.errorToken + 1,
             )
             return
         }
@@ -100,9 +103,14 @@ class LockScreenController(
             state = state.copy(verifying = false, patternResetToken = state.patternResetToken + 1)
             when (result) {
                 VerifyResult.Success -> onUnlocked()
-                is VerifyResult.Failure ->
-                    state = state.copy(message = LockMessage.WrongCredential(result.attemptsBeforeLockout))
-                is VerifyResult.LockedOut -> startCountdown(result.remainingMillis)
+                is VerifyResult.Failure -> state = state.copy(
+                    message = LockMessage.WrongCredential(result.attemptsBeforeLockout),
+                    errorToken = state.errorToken + 1,
+                )
+                is VerifyResult.LockedOut -> {
+                    state = state.copy(errorToken = state.errorToken + 1)
+                    startCountdown(result.remainingMillis)
+                }
                 VerifyResult.NoCredential -> state = state.copy(message = LockMessage.NoCredential)
             }
         }

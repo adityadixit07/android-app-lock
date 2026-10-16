@@ -17,6 +17,8 @@
     <string name="action_open_app_info">Open app info</string>
     <string name="action_enroll_biometric">Set up fingerprint or face</string>
     <string name="action_clear_search">Clear search</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_continue">Continue</string>
 
     <!-- Lock screen -->
     <string name="unlock_app_title">Unlock %1$s</string>
@@ -60,9 +62,12 @@
     <!-- Onboarding -->
     <string name="welcome_title">Protect your private apps</string>
     <string name="welcome_body">Lock chats, photos, banking and anything else behind a PIN, pattern or your fingerprint.</string>
-    <string name="welcome_point_no_ads">No ads, no trackers, open source</string>
-    <string name="welcome_point_offline">No internet permission — your data never leaves this phone</string>
-    <string name="welcome_point_private">Never reads what is on your screen</string>
+    <string name="welcome_point_no_ads">No ads, no trackers</string>
+    <string name="welcome_point_no_ads_body">Free and open source, forever. Nothing to upsell.</string>
+    <string name="welcome_point_offline">Works fully offline</string>
+    <string name="welcome_point_offline_body">No internet permission, so your data never leaves this phone.</string>
+    <string name="welcome_point_private">Never reads your screen</string>
+    <string name="welcome_point_private_body">App Lock only knows which app opened, never what is inside it.</string>
 
     <!-- Permissions -->
     <string name="permissions_title">Permissions</string>
@@ -86,6 +91,9 @@
     <string name="perm_notifications_description">Shows a silent “protection active” notification in Usage access mode, so Android keeps the service running.</string>
     <string name="perm_biometric_title">Fingerprint or face</string>
     <string name="status_granted">Granted</string>
+    <string name="setup_ready_title">Ready to protect your apps</string>
+    <string name="setup_needed_title">Almost there</string>
+    <string name="setup_progress">%1$d of %2$d steps complete</string>
     <string name="status_not_granted">Not granted</string>
 
     <!-- App list -->
@@ -94,6 +102,13 @@
     <string name="show_system_apps">Show system apps</string>
     <string name="no_apps_found">No apps found</string>
     <string name="protection_inactive_title">Protection is off</string>
+    <string name="protection_active_title">You\'re protected</string>
+    <string name="protection_mode_instant">Instant detection via Accessibility</string>
+    <string name="protection_mode_usage">Detection via Usage access</string>
+    <string name="section_locked_apps">Locked · %1$d</string>
+    <string name="section_all_apps">All apps</string>
+    <string name="app_status_locked">Locked</string>
+    <string name="app_status_unlocked">Tap to lock</string>
     <string name="protection_inactive_body">A detection permission is missing, so locked apps can open freely.</string>
     <plurals name="apps_locked_count">
         <item quantity="one">%1$d app locked</item>

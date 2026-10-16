@@ -37,6 +37,7 @@ app/src/main/java/com/adityadixit/applock/
 ├── admin/           DeviceAdminReceiver (uninstall protection)
 ├── di/              Hilt modules
 └── ui/              Compose screens + ViewModels
+    ├── components/    Design-system pieces: AppIcon, IconBadge, SettingsGroup, FeatureRow, rememberLoaded
     ├── lock/          Shared LockScreen, PinPad, PatternLock, LockScreenController
     ├── gate/          PIN gate protecting App Lock itself
     ├── onboarding/    Welcome → create credential → permissions
@@ -201,7 +202,16 @@ example, for per-app relock policies).
 * **Next:** instrumented tests for `KeystoreCipher` and `EncryptedCredentialRepository`, and
   Compose UI tests for `LockScreen`.
 
-## 10. Extension points
+## 10. Build & delivery
+
+* `app/debug.keystore` is the **public** debug key (password `android`), committed on purpose so
+  every CI build has the same signature and can be installed over the previous one. Release
+  builds must use a private key supplied via CI secrets; never this one.
+* CI (`.github/workflows/android.yml`): `build` (unit tests + debug APK artifact) → `publish-debug`
+  replaces the `debug-latest` GitHub pre-release with the new APK. `lint` runs as a separate job
+  so a lint finding never blocks a testable APK.
+
+## 11. Extension points
 
 * **Per-app settings** (own relock policy, own credential): add a Room table behind
   `LockedAppsRepository`. `LockEngine` already keys sessions per package.

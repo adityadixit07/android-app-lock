@@ -15,6 +15,7 @@ captures/
 local.properties
 *.jks
 *.keystore
+!app/debug.keystore
 keystore.properties
 google-services.json
 

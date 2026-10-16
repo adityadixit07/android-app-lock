@@ -20,7 +20,21 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        // Public, well-known debug key committed on purpose (standard password "android"),
+        // so every CI build can be installed over the previous one. Never use it for release.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

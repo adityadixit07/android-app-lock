@@ -4,7 +4,14 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontWeight
+import com.adityadixit.applock.ui.components.IconBadge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -126,6 +133,7 @@ private fun PermissionChecklist(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        SetupProgress(perms)
         Text(
             stringResource(R.string.permissions_intro),
             style = MaterialTheme.typography.bodyMedium,
@@ -207,6 +215,49 @@ private fun PermissionChecklist(
 }
 
 @Composable
+private fun SetupProgress(perms: PermissionSnapshot) {
+    val steps = buildList {
+        add(perms.canProtect)
+        add(perms.overlay || perms.detectionMode == com.adityadixit.applock.system.DetectionMode.ACCESSIBILITY)
+        add(perms.batteryUnrestricted)
+        if (perms.notificationsRequired) add(perms.notifications)
+    }
+    val done = steps.count { it }
+    val progress by animateFloatAsState(done.toFloat() / steps.size, label = "setupProgress")
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (perms.canProtect) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerHigh
+            },
+        ),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                stringResource(
+                    if (perms.canProtect) R.string.setup_ready_title else R.string.setup_needed_title,
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                strokeCap = StrokeCap.Round,
+            )
+            Text(
+                stringResource(R.string.setup_progress, done, steps.size),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+@Composable
 private fun SectionTitle(text: String) {
     Text(
         text,
@@ -227,6 +278,7 @@ private fun PermissionCard(
     footer: @Composable () -> Unit = {},
 ) {
     Card(
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (granted) {
                 MaterialTheme.colorScheme.secondaryContainer
@@ -237,7 +289,7 @@ private fun PermissionCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, contentDescription = null)
+                IconBadge(icon)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(title, style = MaterialTheme.typography.titleMedium)
@@ -263,10 +315,13 @@ private fun BiometricCard(
     onToggle: (Boolean) -> Unit,
     onEnroll: () -> Unit,
 ) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+    ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Fingerprint, contentDescription = null)
+                IconBadge(Icons.Default.Fingerprint)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.perm_biometric_title), style = MaterialTheme.typography.titleMedium)
